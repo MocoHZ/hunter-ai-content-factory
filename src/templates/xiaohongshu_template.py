@@ -53,24 +53,26 @@ class XiaohongshuTemplate(BaseTemplate):
         self.print_header()
 
         try:
-            from src.intel.xiaohongshu_hunter import XiaohongshuHunter, XHS_AUTH_FILE
+            from src.intel.xiaohongshu_hunter import XiaohongshuHunter
 
-            # 检查是否已登录
-            if not XHS_AUTH_FILE.exists():
-                console.print("[yellow]⚠️ 首次使用需要扫码登录[/yellow]")
-                console.print("[cyan]   请运行: uv run hunter xhs-login[/cyan]")
+            # 运行小红书猎手
+            console.print(f"[cyan]📱 启动小红书采集: {self.keyword}[/cyan]")
+            hunter = XiaohongshuHunter()
+
+            # 检查是否已配置 Cookie
+            if not hunter.is_logged_in():
+                console.print("[yellow]⚠️ 未配置小红书 Cookie[/yellow]")
+                console.print("[cyan]   请在 config.yaml 中配置 xiaohongshu.cookies[/cyan]")
+                console.print("[dim]   获取方法: 浏览器登录小红书 → F12 → Application → Cookies → 复制[/dim]")
                 return TemplateResult(
                     success=False,
                     title="",
                     content="",
                     output_path="",
                     push_status="失败",
-                    error="未登录小红书，请先运行 'uv run hunter xhs-login' 扫码登录",
+                    error="未配置小红书 Cookie，请在 config.yaml 中配置 xiaohongshu.cookies",
                 )
 
-            # 运行小红书猎手
-            console.print(f"[cyan]📱 启动小红书采集: {self.keyword}[/cyan]")
-            hunter = XiaohongshuHunter(headless=True)
             result = await hunter.run(keyword=self.keyword, count=self.count)
 
             if result.get("success"):
