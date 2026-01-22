@@ -2,9 +2,10 @@
 Hunter AI 内容工厂 - 全能猎手模块
 
 功能：
-- 综合扫描 Hacker News + Twitter
-- 围绕 AI 生成工具的瑕疵进行分析
+- 综合扫描 HackerNews + Twitter + Reddit + GitHub Trending + 小红书
+- 围绕 AI 生成工具的瑕疵和热点进行分析
 - 生成「AI 生活黑客」风格的解决方案文章
+- 保存 MD 报告到数据库
 - 推送到微信
 
 使用方法：
@@ -16,13 +17,12 @@ import datetime
 import time
 import random
 
-from docx import Document
 from twikit import Client as TwitterClient
 from rich.console import Console
 from rich.progress import track
 
 from src.config import settings
-from src.utils.ai_client import get_ai_client, generate_image
+from src.utils.ai_client import get_ai_client
 from src.intel.utils import (
     create_http_client,
     get_chromadb_client,
@@ -79,6 +79,8 @@ class AutoPublisher:
     def __init__(self):
         """初始化全能猎手"""
         self.intel_list: list[str] = []  # 本次会话情报列表
+        self.intel_images: list[str] = []  # 采集的图片 URL 列表
+        self.intel_sources: list[dict] = []  # 情报源详情（包含图片）
         self.article_content: str = ""    # 生成的文章内容
         self.article_title: str = ""      # 文章标题
         self.push_status: str = ""        # 推送状态
@@ -102,57 +104,6 @@ class AutoPublisher:
         self.collection = client.get_or_create_collection(name="market_insights")
         console.print("[green]✅ ChromaDB 数据库连接成功[/green]")
 
-    def _generate_article_cover(
-        self,
-        article_title: str,
-        article_content: str,
-        output_path: str,
-    ) -> str | None:
-        """
-        基于文章内容动态生成封面图
-
-        Args:
-            article_title: 文章标题
-            article_content: 文章内容
-            output_path: 封面图保存路径
-
-        Returns:
-            str: 封面图路径，失败返回 None
-        """
-        # 检查是否配置了图片生成模型
-        if not settings.gemini.has_image_model:
-            console.print("[dim]未配置 image_model，跳过封面生成[/dim]")
-            return None
-
-        try:
-            # 从文章内容提取关键词
-            content_preview = article_content[:200] if article_content else ""
-
-            # 构建封面图 prompt（AI 生活黑客风格）
-            prompt = f"""Create a modern tech-lifestyle cover image for a WeChat article about AI tools.
-
-Article title: {article_title}
-Content preview: {content_preview}
-
-Style requirements:
-- Modern, clean tech aesthetic
-- Gradient background with blue/purple tones
-- Abstract geometric shapes representing AI/automation
-- Include subtle icons (gears, lightbulb, code symbols)
-- NO text or letters in the image
-- Suitable for WeChat article cover (16:9 aspect ratio)
-- Professional yet creative appearance
-- "AI Lifehacker" vibe - helpful and empowering
-"""
-
-            response = generate_image(prompt, output_path, aspect_ratio="16:9")
-            console.print(f"[green]📷 封面图已生成: {response.saved_path}[/green]")
-            return response.saved_path
-
-        except Exception as e:
-            console.print(f"[yellow]⚠️ 封面图生成失败: {e}[/yellow]")
-            return None
-
     def is_spam(self, text: str) -> bool:
         """
         检查是否为垃圾信息
@@ -165,7 +116,7 @@ Style requirements:
         """
         return any(spam.lower() in text.lower() for spam in SPAM_FILTERS)
 
-    def save_and_buffer(self, source: str, author: str, content: str, tag: str) -> bool:
+    def save_and_buffer(self, source: str, author: str, content: str, tag: str, images: list[str] = None, url: str = "") -> bool:
         """
         保存情报并加入缓冲区
 
@@ -174,10 +125,13 @@ Style requirements:
             author: 作者
             content: 内容
             tag: 标签
+            images: 图片 URL 列表
+            url: 原始链接
 
         Returns:
             bool: 是否为新情报
         """
+        images = images or []
         try:
             doc_id = generate_content_id(source, content, str(author))
 
@@ -201,6 +155,19 @@ Style requirements:
 
             intel_item = f"【{source}】({tag}) @{author}: {content}"
             self.intel_list.append(intel_item)
+
+            # 保存图片和情报源详情
+            if images:
+                self.intel_images.extend(images)
+            self.intel_sources.append({
+                "source": source,
+                "author": author,
+                "content": content[:100],
+                "tag": tag,
+                "url": url,
+                "images": images,
+            })
+
             console.print(f"  💾 [捕获新知] {content[:30]}...")
             return True
 
@@ -215,7 +182,7 @@ Style requirements:
         Returns:
             int: 捕获数量
         """
-        console.print("\n[bold cyan]🔥 [1/2] 扫描 Hacker News...[/bold cyan]")
+        console.print("\n[bold cyan]🔥 [1/5] 扫描 Hacker News...[/bold cyan]")
         count = 0
 
         try:
@@ -230,8 +197,11 @@ Style requirements:
 
                     if item and item.get('score', 0) >= HN_MIN_SCORE:
                         title = item.get('title')
-                        content = f"Title: {title} | Link: {item.get('url', '')}"
-                        if self.save_and_buffer("HackerNews", "Tech", content, "Trend"):
+                        item_url = item.get('url', '')
+                        hn_link = f"https://news.ycombinator.com/item?id={item_id}"
+                        content = f"Title: {title} | Link: {item_url}"
+                        # HackerNews 无图片，但保存链接
+                        if self.save_and_buffer("HackerNews", "Tech", content, "Trend", url=hn_link):
                             count += 1
 
                     time.sleep(0.5)
@@ -253,7 +223,7 @@ Style requirements:
         """
         import json
 
-        console.print("\n[bold cyan]🐦 [2/2] 扫描 Twitter...[/bold cyan]")
+        console.print("\n[bold cyan]🐦 [2/5] 扫描 Twitter...[/bold cyan]")
         client = TwitterClient(language='en-US')
         count = 0
 
@@ -298,7 +268,22 @@ Style requirements:
                             continue
 
                         user = tweet.user.name if tweet.user else "Unknown"
-                        if self.save_and_buffer("Twitter", user, text, keyword):
+
+                        # 提取推文媒体图片
+                        images = []
+                        if hasattr(tweet, 'media') and tweet.media:
+                            for media in tweet.media:
+                                if hasattr(media, 'media_url_https'):
+                                    images.append(media.media_url_https)
+                                elif isinstance(media, dict) and media.get('media_url_https'):
+                                    images.append(media['media_url_https'])
+
+                        # 构建推文链接
+                        tweet_url = ""
+                        if tweet.user and hasattr(tweet.user, 'screen_name'):
+                            tweet_url = f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}"
+
+                        if self.save_and_buffer("Twitter", user, text, keyword, images=images, url=tweet_url):
                             count += 1
 
                     await asyncio.sleep(2)
@@ -308,6 +293,144 @@ Style requirements:
 
         except Exception as e:
             console.print(f"[red]❌ Twitter 模块报错: {e}[/red]")
+
+        return count
+
+    async def hunt_reddit(self) -> int:
+        """
+        扫描 Reddit 热门 AI 讨论
+
+        Returns:
+            int: 捕获数量
+        """
+        console.print("\n[bold cyan]🔴 [3/5] 扫描 Reddit...[/bold cyan]")
+        count = 0
+
+        try:
+            from src.intel.reddit_hunter import RedditHunter
+
+            hunter = RedditHunter(mode="trending")
+            await hunter.run()
+
+            for post in hunter.posts[:10]:  # 取前 10 条
+                content = f"Title: {post.title}"
+                if post.selftext:
+                    content += f" | Content: {post.selftext[:200]}"
+
+                # 提取帖子缩略图
+                images = [post.thumbnail] if post.thumbnail else []
+                if self.save_and_buffer(
+                    "Reddit", f"r/{post.subreddit}", content, "AI Discussion",
+                    images=images, url=post.permalink
+                ):
+                    count += 1
+
+            console.print(f"[green]✅ Reddit 采集: {count} 条[/green]")
+
+        except ImportError as e:
+            console.print(f"[yellow]⚠️ Reddit 模块不可用: {e}[/yellow]")
+
+        except Exception as e:
+            console.print(f"[red]❌ Reddit 模块报错: {e}[/red]")
+
+        return count
+
+    async def hunt_github_trending(self) -> int:
+        """
+        扫描 GitHub Trending AI 项目
+
+        Returns:
+            int: 捕获数量
+        """
+        console.print("\n[bold cyan]🐙 [4/5] 扫描 GitHub Trending...[/bold cyan]")
+        count = 0
+
+        try:
+            from src.intel.github_trending import GitHubTrendingHunter
+
+            hunter = GitHubTrendingHunter()
+            projects = await hunter.fetch_trending(since="daily")
+
+            for project in projects[:10]:  # 取前 10 个
+                content = f"Project: {project.name} | Stars: {project.stars} | {project.description[:100]}"
+
+                # 使用 Socialify 服务生成项目卡片图
+                socialify_url = (
+                    f"https://socialify.git.ci/{project.name}/image"
+                    f"?description=1&font=Inter&language=1&name=1&owner=1"
+                    f"&pattern=Plus&stargazers=1&theme=Auto"
+                )
+
+                if self.save_and_buffer(
+                    "GitHub", project.name, content, "Trending",
+                    images=[socialify_url], url=project.url
+                ):
+                    count += 1
+
+            console.print(f"[green]✅ GitHub Trending 采集: {count} 条[/green]")
+
+        except ImportError as e:
+            console.print(f"[yellow]⚠️ GitHub Trending 模块不可用: {e}[/yellow]")
+
+        except Exception as e:
+            console.print(f"[red]❌ GitHub Trending 模块报错: {e}[/red]")
+
+        return count
+
+    async def hunt_xiaohongshu(self) -> int:
+        """
+        扫描小红书 AI 相关内容
+
+        Returns:
+            int: 捕获数量
+        """
+        console.print("\n[bold cyan]📕 [5/5] 扫描小红书...[/bold cyan]")
+        count = 0
+
+        try:
+            from src.intel.xiaohongshu_browser import XiaohongshuBrowser
+
+            hunter = XiaohongshuBrowser()
+
+            if not hunter.is_logged_in():
+                console.print("[yellow]⚠️ 小红书未登录，跳过[/yellow]")
+                return 0
+
+            # 搜索 AI 相关内容
+            notes = await hunter.search(keyword="AI工具", count=5)
+
+            for note in notes:
+                # 支持 XhsNote 对象和字典两种格式
+                if hasattr(note, 'title'):
+                    # XhsNote 对象
+                    title = note.title
+                    desc = note.desc[:100] if note.desc else ""
+                    author = note.author
+                    images = note.images
+                    url = note.url or f"https://www.xiaohongshu.com/explore/{note.note_id}"
+                else:
+                    # 字典格式
+                    title = note.get("title", "")
+                    desc = note.get("desc", "")[:100]
+                    author = note.get("author", "小红书用户")
+                    images = note.get("images", [])
+                    url = note.get("url", "")
+
+                content = f"Title: {title} | Desc: {desc}"
+
+                if self.save_and_buffer(
+                    "小红书", author, content, "AI工具",
+                    images=images, url=url
+                ):
+                    count += 1
+
+            console.print(f"[green]✅ 小红书采集: {count} 条[/green]")
+
+        except ImportError as e:
+            console.print(f"[yellow]⚠️ 小红书模块不可用: {e}[/yellow]")
+
+        except Exception as e:
+            console.print(f"[yellow]⚠️ 小红书采集失败: {e}[/yellow]")
 
         return count
 
@@ -397,45 +520,14 @@ Style requirements:
         md_path.write_text(article_content, encoding='utf-8')
         console.print(f"[green]📝 Markdown 已保存: {md_path}[/green]")
 
-        # 生成封面图
-        cover_path = get_article_file_path(article_dir, "cover.png")
-        cover_result = self._generate_article_cover(title, article_content, str(cover_path))
-
-        # 生成 Word 文档
-        try:
-            doc = Document()
-            lines = article_content.split('\n')
-
-            for line in lines:
-                line = line.strip()
-                if not line:
-                    continue
-
-                if line.startswith('# '):
-                    doc.add_heading(line.replace('# ', ''), level=1)
-                elif line.startswith('## '):
-                    doc.add_heading(line.replace('## ', ''), level=2)
-                elif line.startswith('### '):
-                    doc.add_heading(line.replace('### ', ''), level=3)
-                elif line.startswith('- ') or line.startswith('* '):
-                    doc.add_paragraph(line[2:], style='List Bullet')
-                else:
-                    doc.add_paragraph(line)
-
-            docx_path = get_article_file_path(article_dir, "article.docx")
-            doc.save(str(docx_path))
-            console.print(f"[green]💾 Word 已保存: {docx_path}[/green]")
-
-        except Exception as e:
-            console.print(f"[red]❌ Word 生成失败: {e}[/red]")
-
         # 保存元数据
         metadata = {
             "title": title,
             "date": today,
             "source": "auto_publisher",
             "intel_count": len(self.intel_list),
-            "cover_image": cover_result if cover_result else None,
+            "cover_images": self.intel_images[:10],  # 保留前 10 张图片作为封面候选
+            "intel_sources": self.intel_sources,      # 包含图片的情报源详情
         }
         metadata_path = get_article_file_path(article_dir, "metadata.json")
         metadata_path.write_text(
@@ -448,13 +540,42 @@ Style requirements:
         wechat_body = f"## 🎨 {today} AI 创意急救包\n\n{article_content}"
         push_to_wechat(title=f"【创意】{title}", content=wechat_body)
 
-    async def run(self):
-        """运行全能猎手完整流程"""
-        c1 = self.hunt_hacker_news()
-        c2 = await self.hunt_twitter()
+    async def run(self, platforms: list[str] = None):
+        """
+        运行全能猎手完整流程
 
-        total = c1 + c2
-        console.print(f"\n📊 新情报总量: {total} 条")
+        Args:
+            platforms: 指定要采集的平台列表，默认为全部
+                      可选: ["hackernews", "twitter", "reddit", "github", "xiaohongshu"]
+        """
+        all_platforms = ["hackernews", "twitter", "reddit", "github", "xiaohongshu"]
+        platforms = platforms or all_platforms
+
+        counts = {}
+
+        # HackerNews
+        if "hackernews" in platforms:
+            counts["hackernews"] = self.hunt_hacker_news()
+
+        # Twitter
+        if "twitter" in platforms:
+            counts["twitter"] = await self.hunt_twitter()
+
+        # Reddit
+        if "reddit" in platforms:
+            counts["reddit"] = await self.hunt_reddit()
+
+        # GitHub Trending
+        if "github" in platforms:
+            counts["github"] = await self.hunt_github_trending()
+
+        # 小红书
+        if "xiaohongshu" in platforms:
+            counts["xiaohongshu"] = await self.hunt_xiaohongshu()
+
+        total = sum(counts.values())
+        detail = " | ".join([f"{k}: {v}" for k, v in counts.items() if v > 0])
+        console.print(f"\n📊 新情报总量: {total} 条 ({detail})")
 
         if total > 0:
             raw_intel = "\n".join(self.intel_list)
@@ -467,17 +588,45 @@ Style requirements:
                 self.article_title = first_line[:30] if first_line else f"创意方案_{get_today_str()}"
 
             self.deliver_result(article)
+
+            # 保存 MD 报告到数据库
+            self._save_report_to_db(article)
+
             self.push_status = "已推送" if settings.push.enabled else "未推送"
         else:
-            console.print("[yellow]❌ 今日未发现新痛点，跳过写作[/yellow]")
+            console.print("[yellow]❌ 今日未发现新情报，跳过写作[/yellow]")
             self.push_status = "无内容"
 
         self.http.close()
 
+    def _save_report_to_db(self, content: str):
+        """
+        保存报告到 ChromaDB 数据库
+
+        Args:
+            content: 报告内容
+        """
+        try:
+            today = get_today_str()
+            report_id = f"news_report_{today}"
+            self.collection.upsert(
+                documents=[content],
+                metadatas=[{
+                    "type": "news_report",
+                    "date": today,
+                    "source": "auto_publisher",
+                    "intel_count": len(self.intel_list),
+                }],
+                ids=[report_id]
+            )
+            console.print(f"[green]💾 报告已存入数据库[/green]")
+        except Exception as e:
+            console.print(f"[yellow]⚠️ 数据库存储失败: {e}[/yellow]")
+
 
 async def main():
     """主函数入口"""
-    console.print("[bold magenta]🚀 全能猎手 v2.0 (全生态版) 启动[/bold magenta]\n")
+    console.print("[bold magenta]🚀 全能猎手 v3.0 (5平台全生态版) 启动[/bold magenta]\n")
 
     try:
         publisher = AutoPublisher()

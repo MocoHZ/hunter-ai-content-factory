@@ -5,7 +5,7 @@ Hunter AI 内容工厂 - GitHub 猎手模块
 - 通过 GitHub API 搜索高星 AI 开源项目
 - 使用 Gemini 翻译项目描述为中文
 - 本地存储已推荐项目，避免重复推荐
-- 生成 Word 报告并推送到微信
+- 生成 MD 报告并推送到微信
 
 使用方法：
     uv run python -m src.intel.github_hunter
@@ -17,8 +17,6 @@ import time
 from datetime import timedelta
 from typing import Optional
 
-from docx import Document
-from docx.shared import Pt, RGBColor
 from rich.console import Console
 from rich.progress import track
 
@@ -306,55 +304,32 @@ class GitHubHunter:
         today = get_today_str()
         sorted_projects = sorted(self.projects, key=lambda x: x['stars'], reverse=True)  # 按 Star 数排序
 
-        # 生成微信推送内容
-        wechat_content = f"# 🚀 GitHub AI 猎手简报 ({today})\n"
-        wechat_content += f"筛选标准: >{settings.github.min_stars} Stars | 共捕获 {len(sorted_projects)} 个项目\n\n"
-        wechat_content += "---\n\n"
+        # 生成 MD 报告内容
+        md_content = f"# 🚀 GitHub AI 猎手简报 ({today})\n\n"
+        md_content += f"筛选标准: >{settings.github.min_stars} Stars | 共捕获 {len(sorted_projects)} 个项目\n\n"
+        md_content += "---\n\n"
 
         for proj in sorted_projects:
-            wechat_content += f"### [{proj['name']}]({proj['url']})\n"
-            wechat_content += f"**⭐ Stars:** {proj['stars']} | **🛠️ 语言:** {proj['lang']}\n"
-            wechat_content += f"> 📝 {proj['desc']}\n\n"
-            wechat_content += "---\n\n"
+            md_content += f"## [{proj['name']}]({proj['url']})\n\n"
+            md_content += f"**⭐ Stars:** {proj['stars']} | **🛠️ 语言:** {proj['lang']} | **📅 更新:** {proj['updated']}\n\n"
+            md_content += f"> 📝 {proj['desc']}\n\n"
+            md_content += "---\n\n"
 
-        # 生成 Word 文档
+        # 保存 MD 报告
         try:
-            doc = Document()
-            doc.add_heading('GitHub AI 开源项目简报 (中文版)', 0)
-            doc.add_paragraph(f"生成日期: {today} | 来源: GitHub API")
-
-            for proj in sorted_projects:
-                p_title = doc.add_heading(level=1)
-                run = p_title.add_run(proj['name'])
-                run.font.color.rgb = RGBColor(0, 51, 102)
-
-                p_meta = doc.add_paragraph()
-                run_meta = p_meta.add_run(
-                    f"⭐ Stars: {proj['stars']}   🛠️ 语言: {proj['lang']}   📅 更新: {proj['updated']}"
-                )
-                run_meta.bold = True
-                run_meta.font.size = Pt(10)
-
-                p_desc = doc.add_paragraph()
-                p_desc.add_run(f"📝 简介: {proj['desc']}").font.color.rgb = RGBColor(50, 50, 50)
-
-                p_link = doc.add_paragraph()
-                p_link.add_run(f"🔗 {proj['url']}").font.color.rgb = RGBColor(0, 102, 204)
-
-                doc.add_paragraph("_" * 30)
-
-            filename = f"GitHub_AI_Report_{today}.docx"
-            filepath = get_dated_output_path(filename, "reports")
-            doc.save(str(filepath))
-            console.print(f"\n[green]📄 报告已生成: {filepath}[/green]")
+            md_filename = f"GitHub_AI_Report_{today}.md"
+            md_filepath = get_dated_output_path(md_filename, "reports")
+            with open(md_filepath, "w", encoding="utf-8") as f:
+                f.write(md_content)
+            console.print(f"\n[green]📄 报告已生成: {md_filepath}[/green]")
 
         except Exception as e:
-            console.print(f"[red]❌ Word 生成失败: {e}[/red]")
+            console.print(f"[red]❌ MD 报告生成失败: {e}[/red]")
 
         # 推送到微信
         push_to_wechat(
             title=f"【开源猎手】今日捕获 {len(sorted_projects)} 个项目",
-            content=wechat_content
+            content=md_content
         )
 
         # 保存推荐历史（避免下次重复推荐）

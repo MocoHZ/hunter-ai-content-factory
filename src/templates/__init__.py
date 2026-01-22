@@ -8,9 +8,10 @@ Hunter AI 内容工厂 - 模板系统
 
 支持的模板类型：
 - github: GitHub 开源推荐（2个项目推荐 + 1个深度解读）
-- pain: 痛点解决方案（从 Twitter 采集痛点，生成解决方案文章）
-- news: 资讯快报（汇总 HackerNews + Twitter 热点）
+- pain: 痛点解决方案（从 Twitter + Reddit 采集痛点，生成解决方案文章）
+- news: 资讯快报（汇总 HackerNews + Twitter + Reddit + GitHub + 小红书 热点）
 - xhs: 小红书热门（采集热门笔记，生成种草文章）
+- auto: 自动创作（全自动 Intel→分析→生成 流水线）
 
 使用方法：
     from src.templates import get_template, TEMPLATES
@@ -150,6 +151,7 @@ def _load_templates():
     from src.templates import pain_template
     from src.templates import news_template
     from src.templates import xiaohongshu_template
+    from src.templates import auto_template
 
 
 # 模板名称常量
@@ -158,6 +160,7 @@ TEMPLATES = {
     "pain": "痛点解决方案",
     "news": "资讯快报",
     "xhs": "小红书热门",
+    "auto": "自动创作",
 }
 
 # 导出

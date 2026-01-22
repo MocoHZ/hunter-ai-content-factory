@@ -3,13 +3,14 @@ Hunter AI 内容工厂 - CLI 主入口
 
 功能：
 - 一键启动：uv run hunter run
-- 支持多种内容模板：github / pain / news
+- 支持多种内容模板：github / pain / news / xhs / auto
 - 全自动执行流程
 
 使用方法：
     uv run hunter run              # 默认运行 github 模板
     uv run hunter run --type pain  # 运行痛点模板
     uv run hunter run --type news  # 运行资讯模板
+    uv run hunter run --type auto  # 运行自动创作模式
     uv run hunter --help           # 查看帮助
 """
 
@@ -36,6 +37,7 @@ def cli():
         uv run hunter run              # 默认：GitHub 开源推荐
         uv run hunter run --type pain  # 痛点解决方案
         uv run hunter run --type news  # 资讯快报
+        uv run hunter run --type auto  # 自动创作模式
 
     \b
     查看帮助：
@@ -52,9 +54,9 @@ def cli():
 @cli.command()
 @click.option(
     '--type', '-t',
-    type=click.Choice(['github', 'pain', 'news', 'xhs']),
+    type=click.Choice(['github', 'pain', 'news', 'xhs', 'auto']),
     default='github',
-    help='内容类型：github(开源推荐) / pain(痛点方案) / news(资讯快报) / xhs(小红书热门)'
+    help='内容类型：github(开源推荐) / pain(痛点方案) / news(资讯快报) / xhs(小红书热门) / auto(自动创作)'
 )
 @click.option('--dry-run', is_flag=True, help='试运行（不推送到微信）')
 def run(type, dry_run):
@@ -64,9 +66,10 @@ def run(type, dry_run):
     \b
     内容类型说明：
       github - GitHub 开源推荐（2个项目 + 1个深度解读）
-      pain   - 痛点解决方案（从 Twitter 采集用户痛点）
-      news   - 资讯快报（HackerNews + Twitter 热点汇总）
+      pain   - 痛点解决方案（从 Twitter + Reddit 采集用户痛点）
+      news   - 资讯快报（5平台热点汇总）
       xhs    - 小红书热门（采集热门笔记生成种草文章）
+      auto   - 自动创作（全自动 Intel→分析→生成 流水线）
 
     \b
     示例：
@@ -75,6 +78,7 @@ def run(type, dry_run):
       uv run hunter run -t pain        # 痛点解决方案
       uv run hunter run -t news        # 资讯快报
       uv run hunter run -t xhs         # 小红书热门
+      uv run hunter run -t auto        # 自动创作模式
       uv run hunter run --dry-run      # 试运行，不推送
     """
     # 显示启动信息

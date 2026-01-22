@@ -35,7 +35,7 @@ import httpx
 
 from src.config import settings, ROOT_DIR
 from src.utils.logger import get_logger
-from src.utils.ai_client import get_ai_client, generate_image
+from src.utils.ai_client import get_ai_client
 from src.intel.utils import create_article_dir, get_article_file_path, get_today_str
 
 logger = get_logger("hunter.intel.xiaohongshu")
@@ -178,57 +178,6 @@ class XiaohongshuHunter:
         if self.client:
             await self.client.aclose()
             self.client = None
-
-    def _generate_article_cover(
-        self,
-        article_title: str,
-        article_content: str,
-        output_path: str,
-    ) -> Optional[str]:
-        """
-        基于文章内容动态生成封面图
-
-        Args:
-            article_title: 文章标题
-            article_content: 文章内容（用于提取关键词）
-            output_path: 封面图保存路径
-
-        Returns:
-            str: 封面图路径，失败返回 None
-        """
-        # 检查是否配置了图片生成模型
-        if not settings.gemini.has_image_model:
-            logger.info("未配置 image_model，跳过封面生成")
-            return None
-
-        try:
-            # 从文章内容提取关键词（取前 200 字作为参考）
-            content_preview = article_content[:200] if article_content else ""
-
-            # 构建封面图 prompt（根据小红书风格）
-            prompt = f"""Create a beautiful lifestyle cover image for a WeChat article.
-
-Article title: {article_title}
-Content preview: {content_preview}
-
-Style requirements:
-- Soft, warm aesthetic suitable for lifestyle/recommendation content
-- Pastel gradient background (pink, peach, or soft blue tones)
-- Clean, minimalist modern design
-- NO text or letters in the image
-- Include subtle decorative elements (abstract shapes, soft patterns)
-- Suitable for WeChat article cover (16:9 aspect ratio)
-- Instagrammable, Xiaohongshu-style aesthetic
-- Professional yet approachable
-"""
-
-            response = generate_image(prompt, output_path, aspect_ratio="16:9")
-            logger.info(f"封面图已生成: {response.saved_path}")
-            return response.saved_path
-
-        except Exception as e:
-            logger.warning(f"封面图生成失败: {e}")
-            return None
 
     def _generate_x_s(self, url: str, data: Optional[dict] = None) -> str:
         """
@@ -637,11 +586,7 @@ Style requirements:
             article_path.write_text(article, encoding="utf-8")
             logger.info(f"文章已保存: {article_path}")
 
-            # 5. 生成封面图
-            cover_path = get_article_file_path(article_dir, "cover.png")
-            cover_result = self._generate_article_cover(title, article, str(cover_path))
-
-            # 6. 保存元数据
+            # 4. 保存元数据
             metadata = {
                 "title": title,
                 "keyword": keyword,
@@ -649,7 +594,6 @@ Style requirements:
                 "date": get_today_str(),
                 "notes_count": len(notes),
                 "notes": [n.to_dict() for n in notes],
-                "cover_image": cover_result if cover_result else None,
             }
             metadata_path = get_article_file_path(article_dir, "metadata.json")
             metadata_path.write_text(
@@ -666,7 +610,6 @@ Style requirements:
                 "keyword": keyword,
                 "style": style,
                 "article_dir": str(article_dir),
-                "cover_image": cover_result,
             }
 
         except Exception as e:
@@ -707,8 +650,6 @@ async def main():
 
         # 输出保存位置
         print(f"📁 文章目录: {result.get('article_dir', 'N/A')}")
-        if result.get("cover_image"):
-            print(f"📷 封面图片: {result['cover_image']}")
     else:
         print(f"\n❌ 采集失败: {result['error']}")
 

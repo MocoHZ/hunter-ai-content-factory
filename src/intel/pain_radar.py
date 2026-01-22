@@ -2,10 +2,11 @@
 Hunter AI 内容工厂 - 痛点雷达模块
 
 功能：
-- 扫描 Twitter 上关于 AI 产品的用户抱怨
+- 扫描 Twitter + Reddit 上关于 AI 产品的用户抱怨
 - 使用 Gemini 进行痛点诊断分析
 - 所有痛点存入 SQLite 数据库（支持标签、合并）
-- 生成诊断报告并推送到微信
+- 生成 MD 诊断报告并存入数据库
+- 推送到微信
 
 使用方法：
     uv run python -m src.intel.pain_radar
@@ -16,7 +17,6 @@ import datetime
 import time
 import random
 
-from docx import Document
 from twikit import Client as TwitterClient
 from rich.console import Console
 from rich.progress import track
@@ -29,6 +29,7 @@ from src.intel.utils import (
     push_to_wechat,
     get_dated_output_path,
     get_today_str,
+    get_output_path,
 )
 from src.intel.pain_store import PainStore  # 痛点结构化存储
 
@@ -212,6 +213,42 @@ class PainRadar:
 
         return count
 
+    async def scan_reddit(self) -> int:
+        """
+        扫描 Reddit 上的用户痛点
+
+        Returns:
+            int: 捕获的痛点数量
+        """
+        console.print("\n[bold cyan]🔴 正在扫描 Reddit 用户痛点...[/bold cyan]")
+        count = 0
+
+        try:
+            from src.intel.reddit_hunter import RedditHunter
+
+            hunter = RedditHunter(mode="pain")
+            await hunter.run()
+
+            # 将 Reddit 痛点保存到数据库
+            for pain_data in hunter.get_pain_points():
+                content = pain_data.get("content", "")
+                author = pain_data.get("author", "Reddit User")
+                url = pain_data.get("url", "")
+                subreddit = pain_data.get("subreddit", "")
+
+                if self.save_pain(f"Reddit/r/{subreddit}", author, content, url):
+                    count += 1
+
+            console.print(f"[green]✅ Reddit 采集完成: {count} 条痛点[/green]")
+
+        except ImportError as e:
+            console.print(f"[yellow]⚠️ Reddit 模块不可用: {e}[/yellow]")
+
+        except Exception as e:
+            console.print(f"[red]❌ Reddit 采集失败: {e}[/red]")
+
+        return count
+
     def analyze_pain_points(self, raw_data: str) -> str:
         """
         使用 Gemini 分析痛点
@@ -277,46 +314,62 @@ class PainRadar:
 
         today = get_today_str()
 
-        # 生成 Word 文档
+        # 保存 MD 报告到文件
         try:
-            doc = Document()
-            doc.add_heading(f'AI 痛点诊断报告 - {today}', 0)
+            md_filename = f"Pain_Report_{today}.md"
+            md_filepath = get_output_path(md_filename, "reports")
+            md_content = f"# 💊 AI 痛点诊断报告 ({today})\n\n{content}"
+            with open(md_filepath, "w", encoding="utf-8") as f:
+                f.write(md_content)
+            console.print(f"[green]📝 MD 报告已保存: {md_filepath}[/green]")
 
-            for line in content.split('\n'):
-                line = line.strip()
-                if not line:
-                    continue
-
-                if line.startswith('# '):
-                    doc.add_heading(line.replace('# ', ''), 1)
-                elif line.startswith('## '):
-                    doc.add_heading(line.replace('## ', ''), 2)
-                elif line.startswith('### '):
-                    doc.add_heading(line.replace('### ', ''), 3)
-                else:
-                    doc.add_paragraph(line)
-
-            filename = f"Pain_Report_{today}.docx"
-            filepath = get_dated_output_path(filename, "reports")
-            doc.save(str(filepath))
-            console.print(f"\n[green]💊 诊断报告已生成: {filepath}[/green]")
+            # 将报告内容存入数据库（ChromaDB）
+            self._save_report_to_db(today, md_content)
 
         except Exception as e:
-            console.print(f"[red]❌ Word 生成失败: {e}[/red]")
+            console.print(f"[yellow]⚠️ MD 报告保存失败: {e}[/yellow]")
 
         # 推送到微信
         wechat_body = f"# 💊 AI 痛点诊断报告 ({today})\n\n{content}"
         push_to_wechat(title="【痛点雷达】诊断报告", content=wechat_body)
 
+    def _save_report_to_db(self, date: str, content: str):
+        """
+        将报告保存到 ChromaDB 数据库
+
+        Args:
+            date: 报告日期
+            content: 报告内容
+        """
+        try:
+            report_id = f"pain_report_{date}"
+            self.collection.upsert(
+                documents=[content],
+                metadatas=[{
+                    "type": "pain_report",
+                    "date": date,
+                    "source": "pain_radar",
+                    "time": datetime.datetime.now().isoformat(),
+                }],
+                ids=[report_id]
+            )
+            console.print(f"[green]💾 报告已存入数据库[/green]")
+        except Exception as e:
+            console.print(f"[yellow]⚠️ 数据库存储失败: {e}[/yellow]")
+
     async def run(self):
-        """运行痛点雷达完整流程"""
-        count = await self.scan_twitter()
-        console.print(f"\n📊 共捕获 {count} 个痛点")
+        """运行痛点雷达完整流程（Twitter + Reddit）"""
+        # 并行扫描 Twitter 和 Reddit
+        twitter_count = await self.scan_twitter()
+        reddit_count = await self.scan_reddit()
+
+        total_count = twitter_count + reddit_count
+        console.print(f"\n📊 共捕获 {total_count} 个痛点 (Twitter: {twitter_count}, Reddit: {reddit_count})")
 
         # 打印数据库统计
         self.pain_store.print_stats()
 
-        if count > 0:
+        if total_count > 0:
             # 格式化痛点数据用于 AI 分析
             raw_pain = self._format_pains_for_analysis()
             report = self.analyze_pain_points(raw_pain)
@@ -356,7 +409,7 @@ class PainRadar:
 
 async def main():
     """主函数入口"""
-    console.print("[bold magenta]📡 痛点雷达 v2.0 启动[/bold magenta]\n")
+    console.print("[bold magenta]📡 痛点雷达 v3.0 启动 (Twitter + Reddit)[/bold magenta]\n")
 
     try:
         radar = PainRadar()

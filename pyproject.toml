@@ -16,7 +16,6 @@ dependencies = [
     "sqlalchemy>=2.0.0",          # SQLite ORM（痛点结构化存储）
     "google-genai>=1.0.0",        # Gemini API 客户端
     "twikit>=2.0.0",              # Twitter 非官方客户端
-    "python-docx>=1.1.0",         # Word 文档生成
     "pyyaml>=6.0.0",              # YAML 配置文件解析
     "click>=8.1.0",               # CLI 框架
     "rich>=13.0.0",               # 终端美化输出
