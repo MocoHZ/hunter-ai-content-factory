@@ -1,0 +1,9 @@
+name: Publish
+description: 将文章推送到微信
+dependencies:
+  - Package
+inputs_from:
+  Package:
+    - title
+    - summary
+    - draft_with_images

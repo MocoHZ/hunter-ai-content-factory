@@ -1,0 +1,50 @@
+{
+  "account_name": "AI技术前沿",
+  "account_tone": "专业且引人入胜",
+  "default_niche": "AI技术",
+  "target_platforms": ["微信公众号"],
+  "banned_words": [
+    "震惊", "必看", "100%", "绝对", "史上最", "惊呆了",
+    "不转不是中国人", "独家曝光", "内幕揭秘", "重大发现",
+    "速看", "疯传", "刷爆朋友圈", "火了", "炸了", "吓死人",
+    "权威专家", "医学证实", "科学证明", "国家认证", "官方认定",
+    "独家秘方", "祖传配方", "包治百病",
+    "限时优惠", "仅剩XX名额", "不可错过", "立即行动",
+    "错过后悔", "最后机会", "手慢无", "赶紧抢",
+    "首先", "其次", "最后", "总之", "综上所述",
+    "值得注意的是", "需要指出的是", "不难发现", "显而易见",
+    "毋庸置疑", "众所周知"
+  ],
+  "ai_word_replacements": {
+    "首先，": "",
+    "其次，": "",
+    "最后，": "",
+    "总之，": "说到底，",
+    "综上所述，": "聊到这里，",
+    "综上所述": "说白了",
+    "值得注意的是": "有意思的是",
+    "需要指出的是": "说句实话",
+    "不难发现": "你会发现",
+    "显而易见": "明摆着的",
+    "毋庸置疑": "没跑了",
+    "众所周知": "大家都知道"
+  },
+  "article_length": {
+    "min": 1500,
+    "max": 2500
+  },
+  "cover_image": {
+    "aspect_ratio": "2.35:1",
+    "default_style": "科技风",
+    "style_mapping": {
+      "AI技术": "cyberpunk, blue and neon, futuristic",
+      "职场成长": "professional, warm colors, business",
+      "生活方式": "minimalist, soft colors, lifestyle",
+      "设计创意": "artistic, vibrant, creative"
+    }
+  },
+  "seo": {
+    "enable_keywords": true,
+    "max_title_length": 22
+  }
+}

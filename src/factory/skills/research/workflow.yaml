@@ -1,0 +1,9 @@
+name: Research
+version: 1.0
+input_schema:
+  topic: string
+  keywords: list
+output_schema:
+  notes: string
+  facts: list
+  references: list

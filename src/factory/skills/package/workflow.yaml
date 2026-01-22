@@ -1,0 +1,9 @@
+name: Package
+version: 1.0
+input_schema:
+  draft: string
+  tone: string
+output_schema:
+  title: string
+  summary: string
+  cover_image_prompt: string

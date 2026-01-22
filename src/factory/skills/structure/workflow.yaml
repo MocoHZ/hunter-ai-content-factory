@@ -1,0 +1,7 @@
+name: Structure
+version: 1.0
+input_schema:
+  research_data: string
+  tone: string
+output_schema:
+  outline: list

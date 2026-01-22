@@ -1,0 +1,9 @@
+name: Topic Selection
+version: 1.0
+input_schema:
+  niche: string
+  trends: list
+output_schema:
+  selected_topic: string
+  rationale: string
+  keywords: list

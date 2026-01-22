@@ -1,0 +1,9 @@
+name: Write
+version: 1.0
+input_schema:
+  outline: list
+  research_data: string
+  length_constraints: object
+  banned_words: list
+output_schema:
+  draft: string

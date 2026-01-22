@@ -1,0 +1,116 @@
+{
+    "key_insights": [
+        "WeChat_Content_Factory采用6步Skill架构（Topic→Research→Structure→Write→Package→Publish），实现了从选题到发布的全流程自动化，每个Skill专注单一职责且有明确的输入输出规范",
+        "数据流设计遵循'完整传递+层级聚合'原则：Topic产出的target_audience、angle贯穿全流程，Research产出在Structure和Write阶段复用，避免信息断层",
+        "工作流强调'去AI味'写作：通过明确观点、真实经验、可操作性三原则，结合口语化风格和争议性表达，产出更接近人类创作者的内容",
+        "集成了Twitter实时情报猎取和PushPlus微信推送能力，实现从信息采集到内容分发的闭环",
+        "每个Skill都有内置质量自检机制（checklist），确保输出符合预期标准"
+    ],
+    "notes": [
+        {
+            "topic": "Skill架构设计",
+            "content": "6个Skill按职责分离：Topic（选题策略）、Research（深度研究）、Structure（大纲设计）、Write（内容撰写）、Package（标题封装）、Publish（推送分发）。每个Skill有三个核心文件：prompt.md（指令）、output.json（输出模板）、workflow.yaml（执行配置）"
+        },
+        {
+            "topic": "选题策略（Topic Skill）",
+            "content": "三维评估模型：用户价值（痛点/爽点）、差异化（反共识/细分垂直）、传播性（值得转发）。输出包含selected_topic、angle、target_audience、rationale、potential_titles、keywords"
+        },
+        {
+            "topic": "研究方法（Research Skill）",
+            "content": "来源优先级：官方文档 > 行业专家一手分享 > 媒体报道 > 社区讨论。支持Twitter猎取（基于twikit库），有垃圾信息过滤机制。优先引用1个月内资料"
+        },
+        {
+            "topic": "结构设计（Structure Skill）",
+            "content": "手机阅读适配：开头3秒抓注意力，每段3-5行，使用小标题作为路标。输出包含hook（开篇钩子）、outline（章节列表）、closing（结尾设计）"
+        },
+        {
+            "topic": "写作原则（Write Skill）",
+            "content": "去AI味三原则：1.明确观点敢说立场；2.真实经验用踩坑代替最佳实践；3.可操作给出具体下一步。引用规范：必须附原文链接、配图说明、时效标注"
+        },
+        {
+            "topic": "封装策略（Package Skill）",
+            "content": "标题优化：22字以内，使用数字/对比/悬念/故事公式。封面图：2.35:1超宽比例，prompt需包含'ultra-wide 2.35:1 aspect ratio'"
+        },
+        {
+            "topic": "发布机制（Publish Skill）",
+            "content": "使用PushPlus API推送Markdown格式文章到微信。错误处理：Token未配置则跳过，网络超时重试3次"
+        },
+        {
+            "topic": "配置管理",
+            "content": "config.json集中管理：账号信息、语气、违禁词、文章长度限制（1500-2500字）、封面图风格映射、SEO设置、推送Token、Twitter爬取配置"
+        }
+    ],
+    "facts": [
+        {
+            "fact": "公众号标题显示限制为22个字符",
+            "source": "Package Skill prompt.md",
+            "reliability": "高"
+        },
+        {
+            "fact": "推荐文章长度1500-2500字",
+            "source": "config.json",
+            "reliability": "高"
+        },
+        {
+            "fact": "封面图推荐比例2.35:1（超宽电影画幅）",
+            "source": "Package Skill prompt.md",
+            "reliability": "高"
+        },
+        {
+            "fact": "每段落控制在3-5行适配手机屏幕",
+            "source": "Structure Skill prompt.md",
+            "reliability": "高"
+        },
+        {
+            "fact": "PushPlus推送标题限制30字",
+            "source": "Publish Skill prompt.md",
+            "reliability": "高"
+        }
+    ],
+    "controversies": [],
+    "references": [
+        {
+            "title": "WeChat_Content_Factory skill.md",
+            "url": "file:///g:/WeChat_Content_Factory/Skill/skill.md",
+            "date": "2026-01-17",
+            "reliability": "高"
+        },
+        {
+            "title": "Topic Skill Prompt",
+            "url": "file:///g:/WeChat_Content_Factory/Skill/Topic/prompt.md",
+            "date": "2026-01-17",
+            "reliability": "高"
+        },
+        {
+            "title": "Research Skill Prompt",
+            "url": "file:///g:/WeChat_Content_Factory/Skill/Research/prompt.md",
+            "date": "2026-01-17",
+            "reliability": "高"
+        },
+        {
+            "title": "Structure Skill Prompt",
+            "url": "file:///g:/WeChat_Content_Factory/Skill/Structure/prompt.md",
+            "date": "2026-01-17",
+            "reliability": "高"
+        },
+        {
+            "title": "Write Skill Prompt",
+            "url": "file:///g:/WeChat_Content_Factory/Skill/Write/prompt.md",
+            "date": "2026-01-17",
+            "reliability": "高"
+        },
+        {
+            "title": "Package Skill Prompt",
+            "url": "file:///g:/WeChat_Content_Factory/Skill/Package/prompt.md",
+            "date": "2026-01-17",
+            "reliability": "高"
+        },
+        {
+            "title": "Publish Skill Prompt",
+            "url": "file:///g:/WeChat_Content_Factory/Skill/Publish/prompt.md",
+            "date": "2026-01-17",
+            "reliability": "高"
+        }
+    ],
+    "gaps": []
+}

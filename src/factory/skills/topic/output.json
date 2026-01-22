@@ -1,0 +1,25 @@
+{
+    "selected_topic": "WeChat_Content_Factory工作流：用AI自动化生成爆款公众号内容",
+    "angle": "从零到一拆解6步Skill架构，让普通人也能搭建自己的AI内容工厂",
+    "target_audience": "对AI自动化感兴趣的技术博主、产品经理、独立创作者，以及希望提升公众号运营效率的中小团队负责人",
+    "rationale": "该选题解决了创作者的核心痛点：内容生产效率低、爆款难复制。以工作流拆解的形式呈现，既有实操价值（附代码和架构），又有差异化（市面上少有完整的AI内容工厂教程）。传播性强，适合转发给同样在做公众号的朋友。",
+    "potential_titles": [
+        "我搭建了一个AI内容工厂，6步自动产出爆款文章",
+        "公众号运营效率提升10倍：WeChat_Content_Factory工作流全解析",
+        "别再手动写推文了！用Skill架构打造你的AI内容流水线",
+        "从选题到发布全自动：揭秘WeChat_Content_Factory的6个核心Skill",
+        "AI时代的内容生产力革命：一套工作流让你告别内容焦虑"
+    ],
+    "keywords": [
+        "AI内容工厂",
+        "微信公众号自动化",
+        "Skill架构",
+        "AI工作流",
+        "内容生产效率",
+        "WeChat Content Factory",
+        "AI workflow automation",
+        "Content pipeline",
+        "Prompt engineering",
+        "LLM application"
+    ]
+}
