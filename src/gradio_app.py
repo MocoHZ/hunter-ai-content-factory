@@ -27,467 +27,17 @@ console = Console()
 ROOT_DIR = Path(__file__).parent.parent
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 自定义 CSS 样式 - 赛博朋克风格，简洁清爽版
+# 自定义 CSS 样式 - 从外部文件加载
 # ═══════════════════════════════════════════════════════════════════════════════
 
-CUSTOM_CSS = """
-/* ═══════════════════════════════════════════════════════════════════════════
-   🎮 简洁清爽白色主题
-   特点：白色背景、无边框卡片、高对比度文字
-═══════════════════════════════════════════════════════════════════════════ */
-
-/* 全局样式 */
-.gradio-container {
-    background: #ffffff !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif !important;
-    font-size: 14px !important;
-    line-height: 1.7 !important;
-    max-width: 1400px !important;
-    margin: 0 auto !important;
-    color: #1a1a2e !important;
-}
-
-/* 图片 - 无边框 */
-.gradio-image, .gradio-image > div, .gradio-image img {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
-}
-
-.gradio-image .icon-buttons {
-    display: none !important;
-}
-
-/* 顶部标题区 - 无框 */
-.header-section {
-    text-align: center;
-    padding: 20px;
-    background: transparent !important;
-    border: none !important;
-}
-
-/* 功能卡片 - 无框透明 */
-.function-card {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 10px !important;
-}
-
-/* 介绍卡片 - 无框透明 */
-.intro-card {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-.intro-card img {
-    border-radius: 8px !important;
-}
-
-/* Tab 标签页 */
-.tab-nav button {
-    background: transparent !important;
-    border: none !important;
-    border-bottom: 2px solid transparent !important;
-    border-radius: 0 !important;
-    margin: 0 8px !important;
-    padding: 12px 20px !important;
-    font-weight: 600 !important;
-    font-size: 15px !important;
-    color: #666666 !important;  /* 深灰色 */
-    transition: all 0.2s ease !important;
-}
-
-.tab-nav button:hover {
-    color: #333333 !important;  /* 悬停更深 */
-    border-bottom-color: rgba(0, 0, 0, 0.2) !important;
-}
-
-.tab-nav button.selected {
-    color: #0066cc !important;  /* 选中用蓝色 */
-    border-bottom: 2px solid #0066cc !important;
-    background: transparent !important;
-}
-
-/* 主按钮 - 蓝色渐变 */
-.primary {
-    background: linear-gradient(135deg, #0066cc 0%, #0099ff 100%) !important;
-    border: none !important;
-    border-radius: 6px !important;
-    font-weight: 700 !important;
-    font-size: 14px !important;
-    color: #fff !important;
-    padding: 12px 28px !important;
-    transition: all 0.2s ease !important;
-}
-
-.primary:hover {
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 20px rgba(0, 102, 204, 0.4) !important;
-}
-
-/* 分隔线 */
-.section-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
-    margin: 25px 0;
-}
-
-/* 输入框 */
-textarea, input[type="text"], input[type="number"], input[type="password"] {
-    background: #f8f9fa !important;
-    border: 1px solid #ddd !important;
-    border-radius: 6px !important;
-    padding: 10px 12px !important;
-    color: #333 !important;
-    font-size: 14px !important;
-}
-
-textarea:focus, input:focus {
-    border-color: #0066cc !important;
-    outline: none !important;
-    background: #fff !important;
-}
-
-textarea::placeholder, input::placeholder {
-    color: #999 !important;
-}
-
-/* 页脚 */
-.footer {
-    text-align: center;
-    padding: 20px;
-    margin-top: 30px;
-    color: #666;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   文字样式
-═══════════════════════════════════════════════════════════════════════════ */
-
-/* 标签 */
-label, .label-wrap {
-    color: #333 !important;
-    font-weight: 500 !important;
-    font-size: 13px !important;
-}
-
-/* 信息提示 */
-.info {
-    color: #666 !important;
-    font-size: 12px !important;
-}
-
-/* Markdown */
-.markdown-text, .prose, .md, p {
-    color: #333 !important;
-}
-
-h1, h2, h3 {
-    color: #1a1a2e !important;
-    font-weight: 600 !important;
-}
-
-strong, b {
-    color: #1a1a2e !important;
-}
-
-code {
-    background: #f0f0f0 !important;
-    color: #0066cc !important;
-    padding: 2px 6px !important;
-    border-radius: 3px !important;
-    font-size: 13px !important;
-}
-
-a {
-    color: #0066cc !important;
-}
-
-/* 列表 */
-li {
-    color: #333 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   组件样式
-═══════════════════════════════════════════════════════════════════════════ */
-
-/* 滑块 */
-input[type="range"] {
-    accent-color: #0066cc !important;
-}
-
-/* 复选框 */
-input[type="checkbox"] {
-    accent-color: #0066cc !important;
-}
-
-/* 下拉框 */
-select, .dropdown {
-    background: #f8f9fa !important;
-    border: 1px solid #ddd !important;
-    color: #333 !important;
-    border-radius: 6px !important;
-}
-
-/* 折叠面板 */
-.accordion, details {
-    background: transparent !important;
-    border: 1px solid #ddd !important;
-    border-radius: 6px !important;
-}
-
-details summary {
-    color: #333 !important;
-}
-
-/* Tips 提示框 */
-div[style*="rgba(255, 200, 0"] {
-    background: #fff8e6 !important;
-    border: 1px solid #ffd866 !important;
-    color: #996600 !important;
-}
-
-div[style*="rgba(0, 255, 255"] {
-    background: #e6f7ff !important;
-    border: 1px solid #69c0ff !important;
-    color: #0066cc !important;
-}
-
-/* 表格 */
-th {
-    background: #f5f5f5 !important;
-    color: #333 !important;
-    padding: 10px !important;
-    border: 1px solid #ddd !important;
-}
-
-td {
-    color: #333 !important;
-    padding: 8px 10px !important;
-    border: 1px solid #eee !important;
-}
-
-/* 引用块 */
-blockquote {
-    border-left: 3px solid #0066cc !important;
-    background: #f5f9ff !important;
-    padding: 10px 16px !important;
-    color: #333 !important;
-}
-
-/* 通用面板 - 无边框 */
-.panel, .block, .form, .gr-box, .gr-panel {
-    background: transparent !important;
-    border: none !important;
-}
-
-/* 输出文本区 */
-.output-textbox textarea, .gr-textbox textarea {
-    color: #333 !important;
-    background: #f8f9fa !important;
-}
-
-/* 状态色 */
-.success { color: #22c55e !important; }
-.error { color: #ef4444 !important; }
-.warning { color: #f59e0b !important; }
-.info { color: #0066cc !important; }
-
-/* 滑块数值显示 */
-.range-value, input[type="number"] {
-    color: #333 !important;
-    background: #f8f9fa !important;
-}
-
-/* 复选框 */
-input[type="checkbox"] {
-    accent-color: #0066cc !important;
-}
-
-/* 复选框标签 */
-.checkbox-label, .gr-check-radio {
-    color: #333 !important;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Markdown 内容 - 高可读性
-───────────────────────────────────────────────────────────────────────────── */
-.markdown-text, .prose, .md, div[class*="markdown"] {
-    color: #333 !important;
-    line-height: 1.8 !important;
-}
-
-/* 标题 */
-.markdown-text h1, .markdown-text h2, .markdown-text h3,
-.prose h1, .prose h2, .prose h3,
-h1, h2, h3 {
-    color: #1a1a2e !important;
-    font-weight: 600 !important;
-    margin-top: 1.5em !important;
-    margin-bottom: 0.8em !important;
-}
-
-/* 加粗文字 */
-.markdown-text strong, .prose strong, strong {
-    color: #1a1a2e !important;
-    font-weight: 600 !important;
-}
-
-/* 段落文字 */
-.markdown-text p, .prose p, p {
-    color: #333 !important;
-    margin-bottom: 1em !important;
-}
-
-/* 列表项 */
-.markdown-text li, .prose li, li {
-    color: #333 !important;
-    margin-bottom: 0.5em !important;
-}
-
-/* 行内代码 */
-.markdown-text code, .prose code, code {
-    background: #f0f0f0 !important;
-    color: #0066cc !important;
-    padding: 2px 8px !important;
-    border-radius: 4px !important;
-    font-family: "SF Mono", "Monaco", "Consolas", monospace !important;
-    font-size: 13px !important;
-}
-
-/* 代码块 */
-pre {
-    background: #f5f5f5 !important;
-    border: 1px solid #ddd !important;
-    border-radius: 8px !important;
-    padding: 16px !important;
-}
-
-pre code {
-    background: transparent !important;
-    padding: 0 !important;
-    color: #333 !important;
-}
-
-/* 链接 */
-a {
-    color: #0066cc !important;
-}
-
-a:hover {
-    color: #004499 !important;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   下拉选择框
-───────────────────────────────────────────────────────────────────────────── */
-select, .dropdown, .svelte-1g805gc {
-    background: #f8f9fa !important;
-    border: 1px solid #ddd !important;
-    color: #333 !important;
-    border-radius: 8px !important;
-}
-
-select option {
-    background: #fff !important;
-    color: #333 !important;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Accordion 折叠面板
-───────────────────────────────────────────────────────────────────────────── */
-.accordion, details {
-    background: #f8f9fa !important;
-    border: 1px solid #ddd !important;
-    border-radius: 8px !important;
-}
-
-.accordion summary, details summary {
-    color: #333 !important;
-    font-weight: 500 !important;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   提示框 - Tips 样式
-───────────────────────────────────────────────────────────────────────────── */
-/* 黄色警告提示 */
-div[style*="rgba(255, 200, 0"] {
-    background: #fff8e6 !important;
-    border: 1px solid #ffd866 !important;
-    color: #996600 !important;
-}
-
-div[style*="rgba(255, 200, 0"] b {
-    color: #885500 !important;
-}
-
-/* 青色信息提示 */
-div[style*="rgba(0, 255, 255"] {
-    background: #e6f7ff !important;
-    border: 1px solid #69c0ff !important;
-    color: #0066cc !important;
-}
-
-div[style*="rgba(0, 255, 255"] b {
-    color: #004499 !important;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   表格样式
-───────────────────────────────────────────────────────────────────────────── */
-table {
-    border-collapse: collapse !important;
-    width: 100% !important;
-}
-
-th {
-    background: #f5f5f5 !important;
-    color: #333 !important;
-    font-weight: 600 !important;
-    padding: 12px !important;
-    border: 1px solid #ddd !important;
-}
-
-td {
-    color: #333 !important;
-    padding: 10px 12px !important;
-    border: 1px solid #eee !important;
-}
-
-tr:hover {
-    background: #f5f9ff !important;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   块引用
-───────────────────────────────────────────────────────────────────────────── */
-blockquote {
-    border-left: 3px solid #0066cc !important;
-    background: #f5f9ff !important;
-    padding: 12px 20px !important;
-    margin: 16px 0 !important;
-    color: #333 !important;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   工具栏和按钮组
-───────────────────────────────────────────────────────────────────────────── */
-.toolbar button, .btn-group button {
-    color: #333 !important;
-    background: #f8f9fa !important;
-    border: 1px solid #ddd !important;
-}
-
-.toolbar button:hover, .btn-group button:hover {
-    background: #e9ecef !important;
-    border-color: #ccc !important;
-}
-"""
+def load_custom_css() -> str:
+    """从外部文件加载 CSS 样式"""
+    css_path = ROOT_DIR / "src" / "static" / "styles.css"
+    if css_path.exists():
+        return css_path.read_text(encoding="utf-8")
+    return ""
+
+CUSTOM_CSS = load_custom_css()
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 6-Skill 数据定义
@@ -1295,7 +845,7 @@ def get_image_path(filename: str) -> str:
     img_path = ROOT_DIR / "docs" / "images" / filename
     if img_path.exists():
         return str(img_path)
-    return None
+    return ""
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -1308,14 +858,39 @@ def create_app():
     with gr.Blocks(title="Hunter AI 内容工厂") as app:
 
         # ═══════════════════════════════════════════════════════════════════
-        # 顶部标题 - 无边框融入背景
+        # 主题切换按钮 + 顶部标题
         # ═══════════════════════════════════════════════════════════════════
         gr.HTML("""
+        <!-- 主题切换按钮 -->
+        <button class="theme-toggle" onclick="toggleTheme()" title="切换深色/浅色主题">
+            <span class="icon-sun">☀️</span>
+            <span class="icon-moon">🌙</span>
+        </button>
+
+        <!-- 主题切换脚本 -->
+        <script>
+            // 初始化主题
+            (function() {
+                const savedTheme = localStorage.getItem('hunter-theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            })();
+
+            // 切换主题
+            function toggleTheme() {
+                const html = document.documentElement;
+                const currentTheme = html.getAttribute('data-theme') || 'light';
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('hunter-theme', newTheme);
+            }
+        </script>
+
+        <!-- 顶部标题 -->
         <div style="text-align: center; padding: 25px 20px;">
             <h1 style="font-size: 2.5em; margin: 0; color: #e91e63; text-shadow: 2px 2px 4px rgba(233,30,99,0.2);">
                 🦅 Hunter AI 内容工厂
             </h1>
-            <p style="font-size: 1.1em; color: #666; margin: 10px 0 0 0;">
+            <p style="font-size: 1.1em; color: var(--text-muted, #666); margin: 10px 0 0 0;">
                 一键生成高质量公众号文章的 AI 工作流
             </p>
         </div>

@@ -1,0 +1,443 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Hunter AI 内容工厂 - 主题样式文件
+   支持深色/浅色主题切换
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   🎨 主题变量定义 - 支持深浅切换
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* 浅色主题（默认） */
+:root, [data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #f0f0f0;
+    --text-primary: #1a1a2e;
+    --text-secondary: #333333;
+    --text-muted: #666666;
+    --text-hint: #999999;
+    --border-color: #dddddd;
+    --border-light: #eeeeee;
+    --accent-color: #0066cc;
+    --accent-hover: #004499;
+    --accent-light: #e6f7ff;
+    --success: #22c55e;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --tip-yellow-bg: #fff8e6;
+    --tip-yellow-border: #ffd866;
+    --tip-yellow-text: #996600;
+    --tip-blue-bg: #e6f7ff;
+    --tip-blue-border: #69c0ff;
+    --tip-blue-text: #0066cc;
+    --code-bg: #f0f0f0;
+    --shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* 深色主题 */
+[data-theme="dark"] {
+    --bg-primary: #1a1f2e;
+    --bg-secondary: #242d3d;
+    --bg-tertiary: #2d3748;
+    --text-primary: #f0f0f0;
+    --text-secondary: #e0e0e0;
+    --text-muted: #a0aec0;
+    --text-hint: #718096;
+    --border-color: #3d4a5c;
+    --border-light: #2d3748;
+    --accent-color: #00d4ff;
+    --accent-hover: #00b8e6;
+    --accent-light: rgba(0, 212, 255, 0.1);
+    --success: #4ade80;
+    --error: #f87171;
+    --warning: #fbbf24;
+    --tip-yellow-bg: rgba(255, 200, 0, 0.15);
+    --tip-yellow-border: rgba(255, 200, 0, 0.4);
+    --tip-yellow-text: #ffd866;
+    --tip-blue-bg: rgba(0, 212, 255, 0.1);
+    --tip-blue-border: rgba(0, 212, 255, 0.3);
+    --tip-blue-text: #00d4ff;
+    --code-bg: #2d3748;
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   全局样式
+═══════════════════════════════════════════════════════════════════════════ */
+
+.gradio-container {
+    background: var(--bg-primary) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.7 !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    color: var(--text-primary) !important;
+    transition: background 0.3s ease, color 0.3s ease !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   主题切换按钮
+═══════════════════════════════════════════════════════════════════════════ */
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon {
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* 浅色主题：显示月亮图标（点击切换到深色） */
+[data-theme="light"] .theme-toggle .icon-sun {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0);
+}
+
+[data-theme="light"] .theme-toggle .icon-moon {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+}
+
+/* 深色主题：显示太阳图标（点击切换到浅色） */
+[data-theme="dark"] .theme-toggle .icon-sun {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+}
+
+[data-theme="dark"] .theme-toggle .icon-moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   图片样式
+═══════════════════════════════════════════════════════════════════════════ */
+
+.gradio-image, .gradio-image > div, .gradio-image img {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+.gradio-image .icon-buttons {
+    display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   顶部标题区
+═══════════════════════════════════════════════════════════════════════════ */
+
+.header-section {
+    text-align: center;
+    padding: 20px;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   功能卡片
+═══════════════════════════════════════════════════════════════════════════ */
+
+.function-card, .intro-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 10px !important;
+}
+
+.intro-card img {
+    border-radius: 8px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Tab 标签页
+═══════════════════════════════════════════════════════════════════════════ */
+
+.tab-nav button {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    margin: 0 8px !important;
+    padding: 12px 20px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    color: var(--text-muted) !important;
+    transition: all 0.2s ease !important;
+}
+
+.tab-nav button:hover {
+    color: var(--text-secondary) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+.tab-nav button.selected {
+    color: var(--accent-color) !important;
+    border-bottom: 2px solid var(--accent-color) !important;
+    background: transparent !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   主按钮
+═══════════════════════════════════════════════════════════════════════════ */
+
+.primary {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%) !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    color: #fff !important;
+    padding: 12px 28px !important;
+    transition: all 0.2s ease !important;
+}
+
+.primary:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 20px var(--shadow) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   输入框
+═══════════════════════════════════════════════════════════════════════════ */
+
+textarea, input[type="text"], input[type="number"], input[type="password"] {
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+    padding: 10px 12px !important;
+    color: var(--text-secondary) !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+}
+
+textarea:focus, input:focus {
+    border-color: var(--accent-color) !important;
+    outline: none !important;
+    background: var(--bg-primary) !important;
+}
+
+textarea::placeholder, input::placeholder {
+    color: var(--text-hint) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   文字样式
+═══════════════════════════════════════════════════════════════════════════ */
+
+label, .label-wrap {
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+}
+
+.info {
+    color: var(--text-muted) !important;
+    font-size: 12px !important;
+}
+
+.markdown-text, .prose, .md, p {
+    color: var(--text-secondary) !important;
+}
+
+h1, h2, h3 {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+}
+
+strong, b {
+    color: var(--text-primary) !important;
+}
+
+code {
+    background: var(--code-bg) !important;
+    color: var(--accent-color) !important;
+    padding: 2px 6px !important;
+    border-radius: 3px !important;
+    font-size: 13px !important;
+}
+
+a {
+    color: var(--accent-color) !important;
+}
+
+a:hover {
+    color: var(--accent-hover) !important;
+}
+
+li {
+    color: var(--text-secondary) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   组件样式
+═══════════════════════════════════════════════════════════════════════════ */
+
+input[type="range"], input[type="checkbox"] {
+    accent-color: var(--accent-color) !important;
+}
+
+select, .dropdown {
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    border-radius: 6px !important;
+}
+
+.accordion, details {
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+}
+
+details summary {
+    color: var(--text-secondary) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Tips 提示框
+═══════════════════════════════════════════════════════════════════════════ */
+
+div[style*="rgba(255, 200, 0"] {
+    background: var(--tip-yellow-bg) !important;
+    border: 1px solid var(--tip-yellow-border) !important;
+    color: var(--tip-yellow-text) !important;
+}
+
+div[style*="rgba(255, 200, 0"] b {
+    color: var(--tip-yellow-text) !important;
+}
+
+div[style*="rgba(0, 255, 255"] {
+    background: var(--tip-blue-bg) !important;
+    border: 1px solid var(--tip-blue-border) !important;
+    color: var(--tip-blue-text) !important;
+}
+
+div[style*="rgba(0, 255, 255"] b {
+    color: var(--tip-blue-text) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   表格
+═══════════════════════════════════════════════════════════════════════════ */
+
+table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+}
+
+th {
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    padding: 12px !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+td {
+    color: var(--text-secondary) !important;
+    padding: 10px 12px !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+tr:hover {
+    background: var(--accent-light) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   引用块
+═══════════════════════════════════════════════════════════════════════════ */
+
+blockquote {
+    border-left: 3px solid var(--accent-color) !important;
+    background: var(--accent-light) !important;
+    padding: 12px 20px !important;
+    margin: 16px 0 !important;
+    color: var(--text-secondary) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   通用面板
+═══════════════════════════════════════════════════════════════════════════ */
+
+.panel, .block, .form, .gr-box, .gr-panel {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   输出文本区
+═══════════════════════════════════════════════════════════════════════════ */
+
+.output-textbox textarea, .gr-textbox textarea {
+    color: var(--text-secondary) !important;
+    background: var(--bg-secondary) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   状态色
+═══════════════════════════════════════════════════════════════════════════ */
+
+.success { color: var(--success) !important; }
+.error { color: var(--error) !important; }
+.warning { color: var(--warning) !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   工具栏
+═══════════════════════════════════════════════════════════════════════════ */
+
+.toolbar button, .btn-group button {
+    color: var(--text-secondary) !important;
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.toolbar button:hover, .btn-group button:hover {
+    background: var(--bg-tertiary) !important;
+}
+
+.checkbox-label, .gr-check-radio {
+    color: var(--text-secondary) !important;
+}
+
+.range-value, input[type="number"] {
+    color: var(--text-secondary) !important;
+    background: var(--bg-secondary) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   页脚
+═══════════════════════════════════════════════════════════════════════════ */
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    color: var(--text-muted);
+}
