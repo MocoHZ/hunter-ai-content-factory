@@ -27,216 +27,276 @@ console = Console()
 ROOT_DIR = Path(__file__).parent.parent
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 自定义 CSS 样式 - 赛博朋克风格，高可读性优化版
+# 自定义 CSS 样式 - 赛博朋克风格，简洁清爽版
 # ═══════════════════════════════════════════════════════════════════════════════
 
 CUSTOM_CSS = """
 /* ═══════════════════════════════════════════════════════════════════════════
-   🎮 赛博朋克主题 - Cyberpunk Neon Style (高可读性优化版)
-
-   设计原则：
-   1. 文字优先使用白色/浅色，确保高对比度
-   2. 霓虹效果仅用于装饰元素（边框、按钮、标题）
-   3. 正文内容不使用发光效果，保持清晰
-   4. 背景适度提亮，减少眼睛疲劳
+   🎮 赛博朋克主题 - 简洁清爽版
+   特点：无边框卡片、干净背景、高对比度文字
 ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   全局样式
-───────────────────────────────────────────────────────────────────────────── */
+/* 全局样式 */
 .gradio-container {
-    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%) !important;
+    background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 100%) !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif !important;
     font-size: 14px !important;
     line-height: 1.7 !important;
     max-width: 1400px !important;
     margin: 0 auto !important;
-    color: #e6edf3 !important;
+    color: #f0f0f0 !important;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   图片组件
-───────────────────────────────────────────────────────────────────────────── */
-.gradio-image {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-}
-
-.gradio-image > div {
+/* 图片 - 无边框 */
+.gradio-image, .gradio-image > div, .gradio-image img {
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
     padding: 0 !important;
-}
-
-.gradio-image img {
-    border-radius: 8px !important;
-    border: 1px solid rgba(0, 255, 255, 0.3) !important;
+    border-radius: 0 !important;
 }
 
 .gradio-image .icon-buttons {
     display: none !important;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   标题区域
-───────────────────────────────────────────────────────────────────────────── */
+/* 顶部标题区 - 无框 */
 .header-section {
     text-align: center;
-    padding: 30px 20px;
-    background: transparent;
-    margin-bottom: 20px;
+    padding: 20px;
+    background: transparent !important;
+    border: none !important;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   功能卡片
-───────────────────────────────────────────────────────────────────────────── */
+/* 功能卡片 - 无框透明 */
 .function-card {
-    background: rgba(22, 27, 34, 0.95) !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(0, 255, 255, 0.25) !important;
-    padding: 20px !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
-    transition: all 0.3s ease !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 10px !important;
 }
 
-.function-card:hover {
-    border-color: rgba(0, 255, 255, 0.5) !important;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 255, 0.1) !important;
+/* 介绍卡片 - 无框透明 */
+.intro-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Tab 标签页按钮
-───────────────────────────────────────────────────────────────────────────── */
-.tab-nav button {
-    background: rgba(22, 27, 34, 0.9) !important;
-    border: 1px solid rgba(0, 255, 255, 0.3) !important;
+.intro-card img {
     border-radius: 8px !important;
-    margin: 3px !important;
-    padding: 12px 24px !important;
+}
+
+/* Tab 标签页 */
+.tab-nav button {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    margin: 0 8px !important;
+    padding: 12px 20px !important;
     font-weight: 600 !important;
-    font-size: 14px !important;
-    color: #7ee8fa !important;
+    font-size: 15px !important;
+    color: #888 !important;
     transition: all 0.2s ease !important;
 }
 
 .tab-nav button:hover {
-    background: rgba(0, 255, 255, 0.1) !important;
-    border-color: #00ffff !important;
-    color: #ffffff !important;
+    color: #00ffff !important;
+    border-bottom-color: rgba(0, 255, 255, 0.5) !important;
 }
 
 .tab-nav button.selected {
-    background: linear-gradient(135deg, rgba(255, 0, 255, 0.2) 0%, rgba(0, 255, 255, 0.2) 100%) !important;
-    border: 2px solid #ff00ff !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 15px rgba(255, 0, 255, 0.3) !important;
+    color: #00ffff !important;
+    border-bottom: 2px solid #00ffff !important;
+    background: transparent !important;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   主按钮
-───────────────────────────────────────────────────────────────────────────── */
+/* 主按钮 - 霓虹渐变 */
 .primary {
     background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%) !important;
     border: none !important;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     font-weight: 700 !important;
-    font-size: 15px !important;
-    color: #000000 !important;
-    padding: 14px 32px !important;
+    font-size: 14px !important;
+    color: #000 !important;
+    padding: 12px 28px !important;
     transition: all 0.2s ease !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
 }
 
 .primary:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(255, 0, 255, 0.4), 0 0 30px rgba(0, 255, 255, 0.3) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 20px rgba(255, 0, 255, 0.4) !important;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   分隔线
-───────────────────────────────────────────────────────────────────────────── */
+/* 分隔线 */
 .section-divider {
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00ffff, #ff00ff, #00ffff, transparent);
-    margin: 30px 0;
-    border-radius: 2px;
-    opacity: 0.6;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+    margin: 25px 0;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   介绍卡片
-───────────────────────────────────────────────────────────────────────────── */
-.intro-card {
-    background: rgba(22, 27, 34, 0.95) !important;
-    border-radius: 12px !important;
-    overflow: hidden !important;
-    border: 1px solid rgba(0, 255, 255, 0.2) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
-    transition: all 0.3s ease !important;
-}
-
-.intro-card:hover {
-    transform: translateY(-4px) !important;
-    border-color: rgba(255, 0, 255, 0.4) !important;
-}
-
-.intro-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   输入框 - 高对比度白色文字
-───────────────────────────────────────────────────────────────────────────── */
+/* 输入框 */
 textarea, input[type="text"], input[type="number"], input[type="password"] {
-    background: rgba(13, 17, 23, 0.95) !important;
-    border: 1px solid rgba(0, 255, 255, 0.3) !important;
-    border-radius: 8px !important;
-    padding: 12px !important;
-    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 6px !important;
+    padding: 10px 12px !important;
+    color: #fff !important;
     font-size: 14px !important;
 }
 
-textarea:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus {
+textarea:focus, input:focus {
     border-color: #00ffff !important;
-    box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.15) !important;
     outline: none !important;
+    background: rgba(255, 255, 255, 0.08) !important;
 }
 
 textarea::placeholder, input::placeholder {
-    color: rgba(230, 237, 243, 0.5) !important;
+    color: rgba(255, 255, 255, 0.4) !important;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   页脚
-───────────────────────────────────────────────────────────────────────────── */
+/* 页脚 */
 .footer {
     text-align: center;
     padding: 20px;
     margin-top: 30px;
-    border-top: 1px solid rgba(0, 255, 255, 0.2);
-    color: rgba(230, 237, 243, 0.6);
+    color: #666;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Gradio 组件样式覆盖 - 确保所有文字清晰可读
+   文字样式
 ═══════════════════════════════════════════════════════════════════════════ */
 
-/* 标签 - 使用亮白色 */
-label, .label-wrap, span.svelte-1gfkn6j {
-    color: #ffffff !important;
+/* 标签 */
+label, .label-wrap {
+    color: #ccc !important;
     font-weight: 500 !important;
-    font-size: 14px !important;
+    font-size: 13px !important;
 }
 
-/* 信息提示文字 */
-.info, .svelte-1gfkn6j.info {
-    color: rgba(230, 237, 243, 0.7) !important;
+/* 信息提示 */
+.info {
+    color: #888 !important;
+    font-size: 12px !important;
 }
+
+/* Markdown */
+.markdown-text, .prose, .md, p {
+    color: #e0e0e0 !important;
+}
+
+h1, h2, h3 {
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+strong, b {
+    color: #fff !important;
+}
+
+code {
+    background: rgba(0, 255, 255, 0.1) !important;
+    color: #7ee8fa !important;
+    padding: 2px 6px !important;
+    border-radius: 3px !important;
+    font-size: 13px !important;
+}
+
+a {
+    color: #00ffff !important;
+}
+
+/* 列表 */
+li {
+    color: #e0e0e0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   组件样式
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* 滑块 */
+input[type="range"] {
+    accent-color: #ff00ff !important;
+}
+
+/* 复选框 */
+input[type="checkbox"] {
+    accent-color: #00ffff !important;
+}
+
+/* 下拉框 */
+select, .dropdown {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+}
+
+/* 折叠面板 */
+.accordion, details {
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 6px !important;
+}
+
+details summary {
+    color: #fff !important;
+}
+
+/* Tips 提示框 */
+div[style*="rgba(255, 200, 0"] {
+    background: rgba(255, 200, 0, 0.1) !important;
+    border: 1px solid rgba(255, 200, 0, 0.3) !important;
+    color: #ffd866 !important;
+}
+
+div[style*="rgba(0, 255, 255"] {
+    background: rgba(0, 255, 255, 0.08) !important;
+    border: 1px solid rgba(0, 255, 255, 0.25) !important;
+    color: #7ee8fa !important;
+}
+
+/* 表格 */
+th {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #00ffff !important;
+    padding: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+td {
+    color: #e0e0e0 !important;
+    padding: 8px 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 引用块 */
+blockquote {
+    border-left: 3px solid #ff00ff !important;
+    background: rgba(255, 0, 255, 0.05) !important;
+    padding: 10px 16px !important;
+    color: #e0e0e0 !important;
+}
+
+/* 通用面板 - 无边框 */
+.panel, .block, .form, .gr-box, .gr-panel {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* 输出文本区 */
+.output-textbox textarea, .gr-textbox textarea {
+    color: #e0e0e0 !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* 状态色 */
+.success { color: #4ade80 !important; }
+.error { color: #f87171 !important; }
+.warning { color: #fbbf24 !important; }
+.info { color: #7ee8fa !important; }
 
 /* 滑块 */
 input[type="range"] {
@@ -419,15 +479,6 @@ blockquote {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   通用面板和容器
-───────────────────────────────────────────────────────────────────────────── */
-.panel, .block, .form, .gr-box, .gr-panel {
-    background: rgba(22, 27, 34, 0.9) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 8px !important;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
    工具栏和按钮组
 ───────────────────────────────────────────────────────────────────────────── */
 .toolbar button, .btn-group button {
@@ -440,24 +491,6 @@ blockquote {
     background: rgba(0, 255, 255, 0.1) !important;
     border-color: rgba(0, 255, 255, 0.3) !important;
 }
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Textbox 输出区域 - 确保长文本可读
-───────────────────────────────────────────────────────────────────────────── */
-.output-textbox textarea, .gr-textbox textarea {
-    color: #e6edf3 !important;
-    background: rgba(13, 17, 23, 0.95) !important;
-    font-size: 14px !important;
-    line-height: 1.7 !important;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   状态指示
-───────────────────────────────────────────────────────────────────────────── */
-.success { color: #4ade80 !important; }
-.error { color: #f87171 !important; }
-.warning { color: #fbbf24 !important; }
-.info { color: #7ee8fa !important; }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    霓虹装饰类（可选用于特殊效果）
