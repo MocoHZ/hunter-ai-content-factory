@@ -119,15 +119,53 @@ Hunter AI 自动从 GitHub Trending、Twitter、HackerNews、Reddit、小红书 
 
 ## ⚡ 30 秒快速体验
 
+### 🚀 零配置启动（推荐）
+
+**空白电脑也能运行，自动下载 Python + 所有依赖！**
+
 ```bash
-# 1. 安装
+# Mac / Linux
+bash run.sh
+
+# Windows（双击运行）
+run.bat
+```
+
+脚本会自动完成：
+
+- ✅ 下载 uv 包管理器（到项目本地目录）
+- ✅ 下载 Python 3.12（由 uv 管理）
+- ✅ 安装所有项目依赖
+- ✅ 安装 Playwright 浏览器驱动
+- ✅ 启动 Gradio Web UI 并自动打开浏览器
+
+> **首次运行**需要下载环境约 3-5 分钟，之后秒启动。
+
+### 📝 配置 API Key
+
+**方式一：Web UI 配置（推荐）**
+
+启动后在浏览器页面的「⚙️ 配置」Tab 中填入 Gemini API Key，点击保存即可。
+
+**方式二：手动编辑配置文件**
+
+```yaml
+# config.yaml
+gemini:
+  api_key: "你的 Gemini API Key"  # 从 Google AI Studio 获取
+```
+
+### 🔧 高级用法（已有 uv 环境）
+
+```bash
+# 1. 安装依赖
 curl -LsSf https://astral.sh/uv/install.sh | sh && uv sync
 
-# 2. 配置（只需一个 Gemini API Key）
+# 2. 配置
 cp config.example.yaml config.yaml
 # 编辑 config.yaml，填入你的 API Key
 
-# 3. 一键启动
+# 3. CLI 启动（不启动 Web UI）
 uv run hunter run
 ```
 
