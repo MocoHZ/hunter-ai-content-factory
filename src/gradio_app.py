@@ -38,7 +38,7 @@ CUSTOM_CSS = """
 
 /* 全局样式 */
 .gradio-container {
-    background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 100%) !important;
+    background: linear-gradient(180deg, #1e2433 0%, #2a3344 100%) !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif !important;
     font-size: 14px !important;
     line-height: 1.7 !important;
