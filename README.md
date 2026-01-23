@@ -1,6 +1,16 @@
 # Hunter AI 内容工厂
 
+<div align="center">
+
 > 🎯 **内容生产也可以像写代码一样，有输入、有输出、有质量保证**
+
+[![QQ群](https://img.shields.io/badge/QQ群-794834282-pink?style=for-the-badge&logo=tencentqq&logoColor=white)](https://qm.qq.com/q/794834282)
+
+![萌萌计数器](https://moe-counter.glitch.me/get/@hunter-ai-qq?theme=rule34)
+
+**QQ 交流群：794834282**
+
+</div>
 
 ---
 
