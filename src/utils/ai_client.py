@@ -26,7 +26,6 @@ import base64
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Optional
-from functools import lru_cache
 
 from src.config import get_settings
 
@@ -249,10 +248,14 @@ class OpenAICompatibleClient(BaseAIClient):
             raise RuntimeError("图片生成失败：未返回有效数据")
 
 
-@lru_cache
+# 存储客户端实例（手动管理缓存）
+_ai_client_instance = None
+_ai_client_provider = None
+
+
 def get_ai_client() -> BaseAIClient:
     """
-    获取 AI 客户端单例
+    获取 AI 客户端
 
     根据配置自动选择：
     - provider=official → 官方 Gemini API
@@ -261,12 +264,20 @@ def get_ai_client() -> BaseAIClient:
     Returns:
         BaseAIClient: AI 客户端实例
     """
-    settings = get_settings()
+    global _ai_client_instance, _ai_client_provider
 
-    if settings.gemini.is_openai_compatible:
-        return OpenAICompatibleClient(settings)
-    else:
-        return OfficialGeminiClient(settings)
+    settings = get_settings()
+    current_provider = "openai_compatible" if settings.gemini.is_openai_compatible else "official"
+
+    # 如果 provider 改变了，重新创建客户端
+    if _ai_client_instance is None or _ai_client_provider != current_provider:
+        if settings.gemini.is_openai_compatible:
+            _ai_client_instance = OpenAICompatibleClient(settings)
+        else:
+            _ai_client_instance = OfficialGeminiClient(settings)
+        _ai_client_provider = current_provider
+
+    return _ai_client_instance
 
 
 async def generate_content(prompt: str, **kwargs) -> str:

@@ -24,11 +24,11 @@ from datetime import datetime
 from dataclasses import asdict
 from typing import Optional, Callable
 
-from google import genai
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from src.config import settings, ROOT_DIR
+from src.utils.ai_client import get_ai_client
 from src.factory.workflow import (
     ContentWorkflow,
     WorkflowContext,
@@ -68,11 +68,12 @@ class SkillExecutor:
         )
 
     def _init_gemini(self):
-        """初始化 Gemini AI"""
+        """初始化 AI 客户端（支持官方 Gemini 和 OpenAI 兼容 API）"""
         if not settings.gemini.api_key:
-            raise ValueError("Gemini API Key 未配置")
+            raise ValueError("API Key 未配置")
 
-        self.client = genai.Client(api_key=settings.gemini.api_key)
+        # 使用统一 AI 客户端（自动根据 provider 选择）
+        self.client = get_ai_client()
         self.model = settings.gemini.model
 
     async def execute(self, prompt: str, skill_name: str) -> dict:
@@ -89,11 +90,10 @@ class SkillExecutor:
         console.print(f"[cyan]🔄 执行 {skill_name} Skill...[/cyan]")
 
         try:
-            # 调用 Gemini API（同步调用，异步包装）
+            # 调用统一 AI 客户端（同步调用，异步包装）
             response = await asyncio.to_thread(
-                self.client.models.generate_content,
-                model=self.model,
-                contents=prompt,
+                self.client.generate_sync,
+                prompt,
             )
 
             # 解析 JSON 响应

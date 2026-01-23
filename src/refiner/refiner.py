@@ -16,10 +16,10 @@ import json
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from google import genai
 from rich.console import Console
 
 from src.config import settings
+from src.utils.ai_client import get_ai_client
 from src.utils.content_filter import ContentFilter, FilterResult
 
 # 终端输出美化
@@ -57,13 +57,15 @@ class ContentRefiner:
         self._init_filter()
 
     def _init_gemini(self):
-        """初始化 Gemini AI"""
+        """初始化 AI 客户端（支持官方 Gemini 和 OpenAI 兼容 API）"""
         if not settings.gemini.api_key:
-            console.print("[red]❌ GEMINI_API_KEY 未配置[/red]")
-            raise ValueError("GEMINI_API_KEY 未配置")
+            console.print("[red]❌ API Key 未配置[/red]")
+            raise ValueError("API Key 未配置")
 
-        self.gemini = genai.Client(api_key=settings.gemini.api_key)
-        console.print("[green]✅ Gemini AI 连接成功[/green]")
+        # 使用统一 AI 客户端
+        self.ai_client = get_ai_client()
+        provider = "第三方聚合" if settings.gemini.is_openai_compatible else "官方 Gemini"
+        console.print(f"[green]✅ AI 客户端连接成功 ({provider})[/green]")
 
     def _init_filter(self):
         """初始化内容过滤器"""
@@ -141,10 +143,7 @@ class ContentRefiner:
         """
 
         try:
-            response = self.gemini.models.generate_content(
-                model=settings.gemini.model,
-                contents=prompt
-            )
+            response = self.ai_client.generate_sync(prompt)
 
             # 尝试解析 JSON
             text = response.text.strip()
