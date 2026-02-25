@@ -20,6 +20,7 @@ from .news_tab import create_news_tab
 from .pain_tab import create_pain_tab
 from .settings_tab import create_settings_tab
 from .xhs_tab import create_xhs_tab
+from .weibo_tab import create_weibo_tab
 
 __all__ = [
     "create_github_tab",
@@ -30,4 +31,5 @@ __all__ = [
     "create_check_tab",
     "create_settings_tab",
     "create_intro_tabs",
+    "create_weibo_tab",
 ]

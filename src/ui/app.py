@@ -18,6 +18,7 @@ from .tabs import (
     create_pain_tab,
     create_settings_tab,
     create_xhs_tab,
+    create_weibo_tab,
 )
 
 
@@ -43,6 +44,7 @@ def create_app():
             create_pain_tab()  # 💊 痛点诊断
             create_news_tab()  # 📰 热点快报
             create_xhs_tab()  # 📕 小红书种草
+            create_weibo_tab()  # 🐦 微博热搜
             create_auto_tab()  # 🚀 全自动生产
             create_check_tab()  # 🔍 内容审核
             create_settings_tab()  # ⚙️ 设置
